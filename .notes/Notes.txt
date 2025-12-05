@@ -1,0 +1,7 @@
+Notes.txt
+
+For pots/side pots:
+    1. Players cannot win more than their bet * the amount of players.
+    2. In the case where a player wins while others have more bet, those players simply gain the total of their bet minus the amount the opponent bet. 
+    3. To display this, I'm not sure what I want to do.
+    4. I don't know at what layer this should be implemented in. 
