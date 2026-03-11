@@ -7,6 +7,7 @@
 use crate::{Action, Game, entities::player::Player};
 use text_io::read;
 pub fn get_input(given_game: &Game, player_ref: &Player) -> Result<Action, String> {
+    let valid_actions_vec = given_game.clone().get_valid_actions(player_ref);
     // Get valid actions for player and only display those.
     loop {
         println!("You are player number {}", given_game.get_table_pos());
@@ -26,12 +27,24 @@ pub fn get_input(given_game: &Game, player_ref: &Player) -> Result<Action, Strin
         println!("_____________________________________________________");
         // println!("Input for player {:?}", player_ref);
         println!("Enter a number corresponding to a choice from below:");
-        println!("  0. Fold");
-        println!("  1. Check");
-        println!("  2. Call");
-        println!("  3. Bet");
-        println!("  4. Raise");
-        println!("  5. All In");
+        if valid_actions_vec.contains(&Action::Fold) {
+            println!("  0. Fold");
+        }
+        if valid_actions_vec.contains(&Action::Check) {
+            println!("  1. Check");
+        }
+        if valid_actions_vec.contains(&Action::Call) {
+            println!("  2. Call");
+        }
+        if valid_actions_vec.contains(&Action::Bet { value: 0 }) {
+            println!("  3. Bet");
+        }
+        if valid_actions_vec.contains(&Action::Raise { value: 0 }) {
+            println!("  4. Raise");
+        }
+        if valid_actions_vec.contains(&Action::AllIn) {
+            println!("  5. All In");
+        }
         let player_input: usize = read!();
         let given_action = match player_input {
             0 => Ok(Action::Fold),

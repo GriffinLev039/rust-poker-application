@@ -41,9 +41,23 @@ impl Game {
         }
     }
 
-    pub fn get_current_players(&mut self) -> &Vec<usize> {
-        self.create_player_reference_vec();
-        &self.player_reference_vector
+    pub fn get_current_players(&mut self) -> Vec<usize> {
+        println!("\n\n\nAAAAAAAAAAAAUGH\n\n\n");
+        let mut player_vec: Vec<usize> = vec![];
+        if self.all_players.len() == 0 {
+            return player_vec;
+        }
+        for num in 0..self.all_players.len() {
+            let player_index = (self.dealer_pos + num) % self.all_players.len();
+            println!("{:?}", self.all_players[player_index]);
+            if self.all_players[player_index].chip_stack != 0
+                || self.all_players[player_index].current_bet != 0
+            // || self.betting_handler.pot.get_chips() == 0
+            {
+                player_vec.push(player_index);
+            }
+        }
+        return player_vec;
     }
 
     pub fn get_player(&self, index: usize) -> &Player {
@@ -384,6 +398,27 @@ impl Game {
             .set_highest_bet(self.betting_handler.get_big_blind());
     }
 
+    pub fn get_valid_actions(&mut self, player: &Player) -> Vec<Action> {
+        // All In and Fold should always be included
+        // Should have bet if max bet is 0, otherwise have raise.
+        // Call available if current bet is less than max bet.
+        // Check available if current bet is equal to max bet.
+        let mut action_vec: Vec<Action> = Vec::new();
+        action_vec.push(Action::AllIn);
+        action_vec.push(Action::Fold);
+        if self.betting_handler.get_highest_bet() == 0 {
+            action_vec.push(Action::Bet { value: 0 });
+        } else {
+            action_vec.push(Action::Raise { value: 0 })
+        }
+        if player.current_bet == self.betting_handler.get_highest_bet() {
+            action_vec.push(Action::Check);
+        } else {
+            action_vec.push(Action::Call);
+        }
+        return action_vec;
+    }
+
     // Function to modify player based on action
     // Returns Result<Action> based on success
     pub fn execute_player_action(
@@ -401,7 +436,7 @@ impl Game {
             match action {
                 Action::AllIn => {
                     *player.mut_is_all_in() = true;
-                    player.increase_bet_to(player.get_chips());
+                    player.make_bet(player.get_chips());
                     if (self.betting_handler.get_highest_bet() < player.get_bet()) {
                         self.betting_handler.set_highest_bet(player.get_bet());
                     }
@@ -518,6 +553,18 @@ impl Game {
     pub fn get_first_player(&self) -> usize {
         self.player_reference_vector
             [self.get_current_dealer() - 1 % self.player_reference_vector.len()]
+    }
+
+    pub fn reset_folded(&mut self) {
+        self.all_players
+            .iter_mut()
+            .for_each(|player| player.has_folded = false);
+    }
+
+    pub fn reset_all_in(&mut self) {
+        self.all_players
+            .iter_mut()
+            .for_each(|player| player.is_all_in = false);
     }
 }
 

@@ -88,9 +88,13 @@ impl Player {
     }
 
     pub fn increase_bet_to(&mut self, value: u32) {
+        println!("Users current bet is {}", self.current_bet);
+        println!("Users current stack is {}", self.chip_stack);
         // The value passed to increase bet to must be greater than the users current value
         self.chip_stack -= value - self.current_bet;
         self.current_bet = value;
+        println!("Users current bet AFTER raise is {}", self.current_bet);
+        println!("Users current stack AFTER raise is {}", self.chip_stack);
     }
 }
 

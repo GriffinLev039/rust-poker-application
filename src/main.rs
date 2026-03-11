@@ -21,13 +21,16 @@ fn main() {
     loop {
         full_round(&mut game_instance);
         // Ends game when a single player is left.
-        if game_instance.get_current_players().len() <= 1 {
-            break;
-        }
         game_instance.deck.reset_deck();
         game_instance.clear_bets();
         game_instance.clear_hands();
         game_instance.reset_river();
+        game_instance.reset_folded();
+        game_instance.reset_all_in();
+        if game_instance.get_current_players().len() <= 1 {
+            println!("Yeah its over");
+            break;
+        }
     }
     println!("{:?}", game_instance);
 }
